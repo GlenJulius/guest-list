@@ -1,53 +1,38 @@
-const form = document.getElementById("guest-form");
-const guestList = document.getElementById("guest-list");
-const guestInput = document.getElementById("guest-name");
+// Wait for the DOM to fully load
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("guest-form");
+  const input = document.getElementById("guest-name");
+  const guestList = document.getElementById("guest-list");
 
-let guests = [];
+  // Listen for form submission
+  form.addEventListener("submit", function (event) {
+    event.preventDefault(); // Prevent page reload
 
-form.addEventListener("submit", function (e) {
-  e.preventDefault();
+    const guestName = input.value.trim(); // Get input value
 
-  const name = guestInput.value.trim();
+    if (guestName === "") return; // Ignore empty input
 
-  if (!name) return alert("Please enter a name");
-  if (guests.length >= 10) return alert("Guest limit reached (10)");
+    // Create a new list item for the guest
+    const listItem = document.createElement("li");
+    listItem.textContent = guestName;
 
-  const guest = {
-    name,
-    attending: true,
-    id: Date.now()
-  };
+    // Create a delete button
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete";
+    deleteBtn.style.marginLeft = "10px";
 
-  guests.push(guest);
-  renderGuests();
-  form.reset();
-});
+    // Add event listener to delete the guest
+    deleteBtn.addEventListener("click", () => {
+      guestList.removeChild(listItem);
+    });
 
-function renderGuests() {
-  guestList.innerHTML = "";
+    // Add the delete button to the list item
+    listItem.appendChild(deleteBtn);
 
-  guests.forEach((guest) => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      ${guest.name} -
-      <span class="${guest.attending ? 'attending' : 'not-attending'}">
-        ${guest.attending ? "Attending" : "Not Attending"}
-      </span>
-      <button onclick="toggleRSVP(${guest.id})">Toggle RSVP</button>
-      <button onclick="removeGuest(${guest.id})">Remove</button>
-    `;
-    guestList.appendChild(li);
+    // Add the list item to the guest list
+    guestList.appendChild(listItem);
+
+    // Clear the input field
+    input.value = "";
   });
-}
-
-function toggleRSVP(id) {
-  guests = guests.map((guest) =>
-    guest.id === id ? { ...guest, attending: !guest.attending } : guest
-  );
-  renderGuests();
-}
-
-function removeGuest(id) {
-  guests = guests.filter((guest) => guest.id !== id);
-  renderGuests();
-}
+});
